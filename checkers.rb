@@ -35,30 +35,30 @@ class HumanPlayer
       puts board.render
       puts "Current player: #{color}"
 
-      moves_arr << get_pos("From pos:")
-      moves_arr << get_pos("To pos:")
-      puts "How many to chain?:"
-      num_chains = gets.chomp.to_i
-      num_chains.times do |i|
-        moves_arr << get_pos("To pos:")
-      end
-      
-      dupped = board.dup_board
-      dupped[moves_arr[0]].perform_moves!(moves_arr)
-            
-      board[moves_arr[0]].perform_moves!(moves_arr)
-      # if board[from_pos].color != @color
-      #   raise StandardError.new("chose opponents piece") 
-      # end       
-#       if (from_pos[0] - to_pos[0]).abs == 1
-#         if board[from_pos].perform_slide(to_pos) == false
-#           raise StandardError.new("invalid slide")
-#         end
-#       else
-#         if board[from_pos].perform_jump(to_pos) == false
-#           raise StandardError.new("invalid jump") 
-#         end
+      from_pos = get_pos("From pos:")
+      to_pos   = get_pos("To pos:")
+      # puts "How many to chain?:"
+#       num_chains = gets.chomp.to_i
+#       num_chains.times do |i|
+#         moves_arr << get_pos("To pos:")
 #       end
+#       
+#       dupped = board.dup_board
+#       dupped[moves_arr[0]].perform_moves!(moves_arr)
+#             
+#       board[moves_arr[0]].perform_moves!(moves_arr)
+      if board[from_pos].color != @color
+        raise StandardError.new("chose opponents piece") 
+      end       
+      if (from_pos[0] - to_pos[0]).abs == 1
+        if board[from_pos].perform_slide(to_pos) == false
+          raise StandardError.new("invalid slide")
+        end
+      else
+        if board[from_pos].perform_jump(to_pos) == false
+          raise StandardError.new("invalid jump") 
+        end
+      end
 
     rescue StandardError => e
       puts "ERROR: #{e.message}"
