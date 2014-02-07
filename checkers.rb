@@ -25,6 +25,9 @@ class Checkers
       players[current_player].play_turn(board)
       @current_player = (current_player == :red) ? :blue : :red
     end
+    puts board.render
+    puts "Game Over!"
+    puts board.count_pieces(:red) != 0 ? "Red Wins!" : "Blue Wins!"
   end
 end
 
