@@ -1,12 +1,17 @@
-##This is a game of checkers
+#This is a game of checkers
+
 ---
-#How to play
+
+##How to play
 *  get a friend
 *  play against him/her
+
 ___
-#Cool things
+
+##Cool things
 *  kinging functionality is all there
 *  colorized!
+
 ---
 
 
