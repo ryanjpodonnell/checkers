@@ -1,5 +1,10 @@
 require 'colorize'
 
+class MyError < StandardError
+  
+end
+
+
 class Checkers
   attr_reader :board, :current_player, :players
   
@@ -35,32 +40,32 @@ class HumanPlayer
       puts board.render
       puts "Current player: #{color}"
 
-      from_pos = get_pos("From pos:")
-      to_pos   = get_pos("To pos:")
-      # puts "How many to chain?:"
-#       num_chains = gets.chomp.to_i
-#       num_chains.times do |i|
-#         moves_arr << get_pos("To pos:")
-#       end
-#       
-#       dupped = board.dup_board
-#       dupped[moves_arr[0]].perform_moves!(moves_arr)
-#             
-#       board[moves_arr[0]].perform_moves!(moves_arr)
-      if board[from_pos].color != @color
-        raise StandardError.new("chose opponents piece") 
-      end       
-      if (from_pos[0] - to_pos[0]).abs == 1
-        if board[from_pos].perform_slide(to_pos) == false
-          raise StandardError.new("invalid slide")
-        end
-      else
-        if board[from_pos].perform_jump(to_pos) == false
-          raise StandardError.new("invalid jump") 
-        end
+      moves_arr << get_pos("From pos:")
+      moves_arr << get_pos("To pos:")
+      puts "How many to chain?:"
+      num_chains = gets.chomp.to_i
+      num_chains.times do |i|
+        moves_arr << get_pos("To pos:")
       end
+      
+      dupped = board.dup_board
+      dupped[moves_arr[0]].perform_moves!(moves_arr, color)
+            
+      board[moves_arr[0]].perform_moves!(moves_arr, color)
+      # if board[from_pos].color != @color
+      #   raise StandardError.new("chose opponents piece") 
+      # end       
+      # if (from_pos[0] - to_pos[0]).abs == 1
+      #   if board[from_pos].perform_slide(to_pos) == false
+      #     raise StandardError.new("invalid slide")
+      #   end
+      # else
+      #   if board[from_pos].perform_jump(to_pos) == false
+      #     raise StandardError.new("invalid jump") 
+      #   end
+      # end
 
-    rescue StandardError => e
+    rescue MyError => e
       puts "ERROR: #{e.message}"
       
       retry
@@ -159,7 +164,7 @@ end
 
 
 class Piece
-  attr_accessor :color, :pos, :king
+  attr_accessor :board, :color, :pos, :king
   
   BLUE = [
     [1,  1],
@@ -201,24 +206,22 @@ class Piece
     false
   end
   
-  def perform_moves!(moves_arr)
+  def perform_moves!(moves_arr, moving_color)
+    if board[moves_arr[0]].color != moving_color
+      raise MyError.new("chose opponents piece") 
+    end
+    
     if moves_arr.count == 2
-      
-      from_pos = moves_arr[0].chomp.split(",").map { |coord_s| coord_s.to_i }
-      to_pos   = moves_arr[1].chomp.split(",").map { |coord_s| coord_s.to_i }
-      
-      
-      if board[from_pos].color != @color
-        raise StandardError.new("chose opponents piece") 
-      end
+      from_pos = moves_arr[0]
+      to_pos   = moves_arr[1]
       
       if (from_pos[0] - to_pos[0]).abs == 1
         if board[from_pos].perform_slide(to_pos) == false
-          raise StandardError.new("invalid slide")
+          raise MyError.new("invalid slide")
         end
       else
         if board[from_pos].perform_jump(to_pos) == false
-          raise StandardError.new("invalid jump") 
+          raise MyError.new("invalid jump") 
         end
       end
       
@@ -228,10 +231,13 @@ class Piece
     
     from_pos = moves_arr.shift
     until moves_arr.empty?
-      to_pos   = moves.arr.shift
+      to_pos   = moves_arr.shift
+      
+      p from_pos
+      p to_pos
       
       if board[from_pos].perform_jump(to_pos) == false
-        raise StandardError.new("invalid jump") 
+        raise MyError.new("invalid jump") 
       end
       board[to_pos].maybe_promote
       
