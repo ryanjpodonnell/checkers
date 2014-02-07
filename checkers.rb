@@ -1,7 +1,7 @@
 require 'colorize'
+require 'debugger'
 
 class MyError < StandardError
-  
 end
 
 
@@ -48,24 +48,23 @@ class HumanPlayer
         moves_arr << get_pos("To pos:")
       end
       
+      # if moves_arr.any? {|el| el.length != 2}
+#         raise MyError.new("you didn't enter correct coorinates")
+#       end
+#       if board[moves_arr[0]].nil?
+#         raise MyError.new("you didn't even choose a piece...")
+#       end
+      
       dupped = board.dup_board
-      dupped[moves_arr[0]].perform_moves!(moves_arr, color)
-            
+      dupped_arr = moves_arr.dup
+      dupped[moves_arr[0]].perform_moves!(dupped_arr, color)
       board[moves_arr[0]].perform_moves!(moves_arr, color)
-      # if board[from_pos].color != @color
-      #   raise StandardError.new("chose opponents piece") 
-      # end       
-      # if (from_pos[0] - to_pos[0]).abs == 1
-      #   if board[from_pos].perform_slide(to_pos) == false
-      #     raise StandardError.new("invalid slide")
-      #   end
-      # else
-      #   if board[from_pos].perform_jump(to_pos) == false
-      #     raise StandardError.new("invalid jump") 
-      #   end
-      # end
-
+      
     rescue MyError => e
+      puts "ERROR: #{e.message}"
+      
+      retry
+    rescue StandardError => e
       puts "ERROR: #{e.message}"
       
       retry
@@ -233,9 +232,6 @@ class Piece
     until moves_arr.empty?
       to_pos   = moves_arr.shift
       
-      p from_pos
-      p to_pos
-      
       if board[from_pos].perform_jump(to_pos) == false
         raise MyError.new("invalid jump") 
       end
@@ -247,7 +243,7 @@ class Piece
   
   def maybe_promote
     if (color == :blue && pos[0] == 9) || (color == :red && pos[0] == 0)
-      king = true
+      self.king = true
     end
   end
   
